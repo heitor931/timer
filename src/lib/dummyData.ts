@@ -1,7 +1,7 @@
  export  const timers = [
         {
             timerName: "Morning Alarm",
-            currentTime: 3600,
+            currentTime: 15*60,
             timerId: "timer-1",
             timerEventList: ["event-1", "event-2"],
             timerTriggerList: ["trigger-1", "trigger-2"],

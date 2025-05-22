@@ -5,11 +5,23 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { TimerType } from '@/lib/dummyData';
 
-const Timer = ({timerName}: TimerType) => {
-    const [seconds, setSeconds] = useState(3600);
+const Timer = ({timerName, currentTime}: TimerType) => {
+    const [seconds, setSeconds] = useState(currentTime);
     const [isActive, setIsActive] = useState(false);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const [timerLocalName, setTimerName] = useState(timerName);
+
+    
+    useEffect(() => {
+        const handleBeforeUnload = () => {
+            console.log('Seconds before refresh:', seconds);
+        };
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, [seconds]);
+
 
     // For set timer dialog
     const [showSetDialog, setShowSetDialog] = useState(false);
