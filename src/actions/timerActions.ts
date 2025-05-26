@@ -1,32 +1,41 @@
 "use server";
 
-import {  timers } from "@/lib/dummyData";
 import { createNewTimer } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
+import { prisma } from "../../prisma";
 
-export const addNewTimerAction = async(formData:FormData) => { 
-    const timerName = formData.get("timerName") as string;
-    console.log(timerName);
+export const addNewTimerAction = async (
+  prevState: { message: string; success: boolean },
+  formData: FormData
+) => {
+  const timerName = formData.get("timerName") as string;
+  // console.log(prevState);
+  if (!timerName || timerName.trim() === "") {
+    return {
+      success: false,
+      message: "Timer name cannot be empty",
+    };
+  }
+
+  try {
+    const newTimer = createNewTimer(timerName);
     
-    try {
-
-        const newTimer = createNewTimer(timerName);
-        timers.unshift(newTimer); // add the new timer to the timers array
-
-        // create a new timer object
-        
-    } catch (error) {
-        if (error) {
-            return {
-                message: "Error adding new timer",
-            }
-        }
-          return {
-        message:"New timer added successfully",
-    }
-    }
+    // create a new timer object
+    await prisma.timer.create({
+      data: newTimer
+    })
 
     revalidatePath("/timer");
-    
-  
- }
+  } catch (error) {
+    if (error) {
+      return {
+        success: false,
+        message: "Error adding new timer",
+      };
+    }
+    return {
+      success: true,
+      message: "New timer added successfully",
+    };
+  }
+};

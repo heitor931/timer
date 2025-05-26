@@ -1,0 +1,37 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Timer {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  timerName        String
+  currentTime      Int
+  timerId          String
+  timerEventList   String[]
+  timerTriggerList String[]
+  timerStartDate   String
+  timerStartTime   String
+  timerEndDate     String
+  timerEndTime     String
+  isPaused         Boolean
+  isActive         Boolean
+  isSet            Boolean
+  isRunning        Boolean
+  isStopped        Boolean
+  isReset          Boolean
+  isStarted        Boolean
+  isFinished       Boolean
+  isCompleted      Boolean
+}
