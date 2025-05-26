@@ -1,5 +1,7 @@
 "use server";
 
+import {  timers } from "@/lib/dummyData";
+import { createNewTimer } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 
 export const addNewTimerAction = async(formData:FormData) => { 
@@ -8,11 +10,17 @@ export const addNewTimerAction = async(formData:FormData) => {
     
     try {
 
+        const newTimer = createNewTimer(timerName);
+        timers.unshift(newTimer); // add the new timer to the timers array
+
         // create a new timer object
         
-
-        
     } catch (error) {
+        if (error) {
+            return {
+                message: "Error adding new timer",
+            }
+        }
           return {
         message:"New timer added successfully",
     }
