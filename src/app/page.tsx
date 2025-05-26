@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 function Home() {
   return (
     <main>
@@ -7,9 +9,9 @@ function Home() {
           <p className="text-gray-600 mb-8">
         Track your time efficiently with our simple and easy-to-use timer application.
           </p>
-          <button className="px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold shadow hover:bg-indigo-700 transition">
+          <Link href={"/timer"} className="px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold shadow hover:bg-indigo-700 transition">
         Get Started
-          </button>
+          </Link>
         </div>
       </div>
       
