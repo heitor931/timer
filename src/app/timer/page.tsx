@@ -3,9 +3,11 @@ import InputWithButton from "@/components/InputWithButton";
 import Timer from "@/components/Timer";
 //import { timers } from "@/lib/dummyData";
 import { prisma } from "../../../prisma";
+import TimerHeader from "@/components/TimerHeader";
 
 async function TimerHome() {
 const timers = await prisma.timer.findMany({
+ 
   select: {
     timerName: true,
     currentTime: true,
@@ -33,10 +35,20 @@ const timers = await prisma.timer.findMany({
   return (
     <main className="flex flex-col gap-3 flex-wrap p-2">
         <InputWithButton />
-<div className="flex flex-col gap-4 ">
-     {timers.map((timer) => (
-        <Timer key={timer.timerId} {...timer} />
-      ))}
+<div className="flex justify-between gap-4 ">
+  <div className="flex  flex-col w-72 gap-2">
+    {timers.map((timer) => (
+      <TimerHeader key={timer.timerId} {...timer} />
+    ))}
+  </div>
+  {/* <hr className="w-full m-auto border border-white  rotate-90" /> */}
+  <div className="flex gap-2">
+    {
+      timers.map((timer) => timer.isActive && <Timer key={timer.timerId} {...timer} />)
+    }
+
+  </div>
+
 </div>
     
     </main>

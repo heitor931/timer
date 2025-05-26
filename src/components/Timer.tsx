@@ -5,9 +5,8 @@ import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { TimerType } from "@/lib/dummyData";
 
-const Timer = ({ timerName, currentTime }: TimerType) => {
-  const [seconds, setSeconds] = useState(currentTime);
-  const [isActive, setIsActive] = useState(false);
+const Timer = ({ timerName, currentTime,isActive }: TimerType) => {
+  const [seconds, setSeconds] = useState(currentTime || 3600); // Default to 1 hour if no currentTime is provided
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [timerLocalName, setTimerName] = useState(timerName);
 
@@ -28,7 +27,7 @@ const Timer = ({ timerName, currentTime }: TimerType) => {
   const [inputHours, setInputHours] = useState(1);
   const [inputMinutes, setInputMinutes] = useState(0);
   const [inputSeconds, setInputSeconds] = useState(0);
-  const [showTimer, setShowTimer] = useState(false);
+  const [showTimer, setShowTimer] = useState(isActive);
 
   useEffect(() => {
     window.addEventListener("click", () => {
@@ -53,13 +52,13 @@ const Timer = ({ timerName, currentTime }: TimerType) => {
   })
 
   const startTimer = () => {
-    if (!isActive && seconds > 0) {
-      setIsActive(true);
+    if (!showTimer && seconds > 0) {
+      setShowTimer(true);
       intervalRef.current = setInterval(() => {
         setSeconds((prev) => {
           if (prev <= 1) {
             clearInterval(intervalRef.current!);
-            setIsActive(false);
+            setShowTimer(false);
             return 0;
           }
           return prev - 1;
@@ -69,14 +68,14 @@ const Timer = ({ timerName, currentTime }: TimerType) => {
   };
 
   const pauseTimer = () => {
-    setIsActive(false);
+    setShowTimer(false);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
   };
 
   const resetTimer = () => {
-    setIsActive(false);
+    setShowTimer(false);
     setSeconds(0);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -103,7 +102,7 @@ const Timer = ({ timerName, currentTime }: TimerType) => {
   const handleSetTimer = () => {
     const total = inputHours * 3600 + inputMinutes * 60 + inputSeconds;
     setSeconds(total);
-    setIsActive(false);
+    setShowTimer(false);
     setShowSetDialog(false);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -116,18 +115,18 @@ const Timer = ({ timerName, currentTime }: TimerType) => {
    }
 
   return (
-    <main className="flex  gap-6 justify-start items-start ">
-      <Input
-      onClick={handleShowTimer}
-        type="text"
-        style={{backgroundColor: showTimer ? "#3b82f6" : "#000", color: showTimer ? "#000" : "white"}}
-        className="w-80 text-center"
-        value={timerLocalName}
-        onChange={(e) => setTimerName(e.target.value)}
-        placeholder="Timer Name"
-      />
+    <main onClick={(e) => e.stopPropagation()} className="flex  gap-6 justify-start items-start  ">
       {showTimer && (
-        <div className="flex absolute left-[24rem] top-30 flex-col border p-4 mt-2  border-white rounded items-center justify-center min-h-fit w-fit">
+        <div className="flex  flex-col border p-4 mt-2  border-white rounded items-center justify-center min-h-fit w-fit">
+          <Input
+          onClick={handleShowTimer}
+            type="text"
+            style={{backgroundColor: showTimer ? "#3b82f6" : "#000", color: showTimer ? "#000" : "white"}}
+            className="w-80 text-center"
+            value={timerLocalName}
+            onChange={(e) => setTimerName(e.target.value)}
+            placeholder="Timer Name"
+          />
           <div className="relative mt-4 flex items-center justify-center mb-8">
             {/* Animated circular border */}
             <svg

@@ -21,7 +21,7 @@ function InputWithButton() {
 
 
   return (
-    <form action={action} className="flex w-full max-w-sm items-center space-x-2">
+    <form action={action} className="flex m-auto w-full max-w-sm items-center space-x-2">
       <Input  type="text" name="timerName" placeholder="Add a new timer" />
       <Button type="submit">Submit</Button>
       {isPending && <p className="text-blue-500 absolute translate-y-10 bg-white rounded border p-1">Adding...</p>}

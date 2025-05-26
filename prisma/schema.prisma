@@ -14,7 +14,7 @@ model Timer {
   id               String   @id @default(auto()) @map("_id") @db.ObjectId
   timerName        String
   currentTime      Int
-  timerId          String
+  timerId          String   @unique
   timerEventList   String[]
   timerTriggerList String[]
   timerStartDate   String

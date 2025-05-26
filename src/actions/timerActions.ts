@@ -39,3 +39,19 @@ export const addNewTimerAction = async (
     };
   }
 };
+
+export const showTimerAction = async(active:boolean, timerId:string) => { 
+  console.log(active, timerId);
+  
+  await prisma.timer.update({
+    where: {
+      timerId: timerId,
+    },
+    data: {
+      isActive: active,
+    }     
+  })
+
+  revalidatePath("/timer");
+
+ }
