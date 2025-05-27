@@ -27,6 +27,7 @@ export function getCurrentTime(): string {
         return {
             timerName: title,
             currentTime: 900,
+            initialTime: 900,
             timerId: crypto.randomUUID(),
             timerEventList: ["event-3", "event-4"],
             timerTriggerList: ["trigger-3", "trigger-4"],

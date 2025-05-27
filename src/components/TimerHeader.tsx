@@ -24,7 +24,6 @@ function TimerHeader({ timerName, timerId, isActive }: TimerHeaderProps) {
   const activateAction = showTimerAction.bind(null, !activate, timerId);
 
   const handleClick = () => {
-    console.log("clicked");
     
     setActivate(!activate);
     showTimer(timerId);

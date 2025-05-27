@@ -35,7 +35,7 @@ function InputWithButton() {
       // update the database with the new timer
       
       startTransition(() => {
-      action(formData);
+       action(formData);
      
     });
      

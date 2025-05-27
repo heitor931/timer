@@ -26,7 +26,6 @@ export const addNewTimerAction = async (
     await prisma.timer.create({
       data: newTimer
     })
-    console.log("New timer created:", newTimer);
     
 
     revalidatePath("/timer");
@@ -116,6 +115,48 @@ export const openVlcAction = async () => {
     return {
       success: false,
       message: "Error opening VLC",
+    };
+  }
+};
+
+// update current time action
+export const updateCurrentTimeAction = async (timerId: string, currentTime: number) => {
+  try {
+    await prisma.timer.update({
+      where: { timerId },
+      data: { currentTime }
+    });
+    revalidatePath("/timer");
+    return {
+      success: true,
+      message: "Current time updated successfully",
+    };
+  } catch (error) {
+    console.error("Error updating current time:", error);
+    return {
+      success: false,
+      message: "Error updating current time",
+    };
+  }
+};
+
+// update timer start date action
+export const updateInitialTimeAction = async (timerId: string, initialTime: number) => {
+  try {
+    await prisma.timer.update({
+      where: { timerId },
+      data: { initialTime }
+    });
+    revalidatePath("/timer");
+    return {
+      success: true,
+      message: "Timer start time updated successfully",
+    };
+  } catch (error) {
+    console.error("Error updating timer start time:", error);
+    return {
+      success: false,
+      message: "Error updating timer start time",
     };
   }
 };

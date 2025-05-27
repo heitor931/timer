@@ -23,6 +23,7 @@ async function TimerHome() {
       isStarted: true,
       isFinished: true,
       isCompleted: true,
+      initialTime: true,
     },
   });
 
