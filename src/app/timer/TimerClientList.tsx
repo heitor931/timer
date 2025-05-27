@@ -2,7 +2,7 @@
 import Timer from "@/components/Timer";
 import type { TimerType } from "@/lib/dummyData";
 import useTimerStore from "./_context/store";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import TimerHeader from "@/components/TimerHeader";
 import InputWithButton from "@/components/InputWithButton";
 
@@ -27,7 +27,7 @@ function TimerClientList({ activeTimers }: { activeTimers: TimerType[] }) {
         </div>
         <div className="flex gap-2 w-[75%] flex-wrap">
         {render.map(
-          (timer) => timer.isActive && <Timer key={timer.timerId} {...timer} />
+          (timer) => timer.isActive && <Suspense fallback={<div>Loading timers...</div>} key={timer.timerId}><Timer  {...timer} /></Suspense>
         )}
 
         </div>
