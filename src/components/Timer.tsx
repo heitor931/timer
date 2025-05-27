@@ -7,6 +7,7 @@ import { TimerType } from "@/lib/dummyData";
 
 const Timer = ({ timerName, currentTime,isActive }: TimerType) => {
   const [seconds, setSeconds] = useState(currentTime || 3600); // Default to 1 hour if no currentTime is provided
+  const [isActivated, setIsActive] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [timerLocalName, setTimerName] = useState(timerName);
 
@@ -52,13 +53,13 @@ const Timer = ({ timerName, currentTime,isActive }: TimerType) => {
   })
 
   const startTimer = () => {
-    if (!showTimer && seconds > 0) {
-      setShowTimer(true);
+    if (!isActivated && seconds > 0) {
+      setIsActive(true);
       intervalRef.current = setInterval(() => {
         setSeconds((prev) => {
           if (prev <= 1) {
             clearInterval(intervalRef.current!);
-            setShowTimer(false);
+            setIsActive(false);
             return 0;
           }
           return prev - 1;
@@ -68,15 +69,15 @@ const Timer = ({ timerName, currentTime,isActive }: TimerType) => {
   };
 
   const pauseTimer = () => {
-    setShowTimer(false);
+    setIsActive(false);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
   };
 
   const resetTimer = () => {
-    setShowTimer(false);
-    setSeconds(0);
+    setIsActive(false);
+    setSeconds(currentTime);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
@@ -100,9 +101,11 @@ const Timer = ({ timerName, currentTime,isActive }: TimerType) => {
   };
 
   const handleSetTimer = () => {
+    console.log(timerName);
+    
     const total = inputHours * 3600 + inputMinutes * 60 + inputSeconds;
     setSeconds(total);
-    setShowTimer(false);
+    setIsActive(false);
     setShowSetDialog(false);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -116,7 +119,7 @@ const Timer = ({ timerName, currentTime,isActive }: TimerType) => {
 
   return (
     <main onClick={(e) => e.stopPropagation()} className="flex  gap-6 justify-start items-start  ">
-      {showTimer && (
+     
         <div className="flex  flex-col border p-4 mt-2  border-white rounded items-center justify-center min-h-fit w-fit">
           <Input
           onClick={handleShowTimer}
@@ -159,7 +162,7 @@ const Timer = ({ timerName, currentTime,isActive }: TimerType) => {
                         3600))
                 }
                 className={`transition-[stroke-dashoffset] duration-1000 ease-linear ${
-                  isActive ? "drop-shadow-[0_0_8px_#3b82f6]" : ""
+                  isActivated ? "drop-shadow-[0_0_8px_#3b82f6]" : ""
                 }`}
                 strokeLinecap="round"
                 transform="rotate(-90 90 90)"
@@ -172,9 +175,9 @@ const Timer = ({ timerName, currentTime,isActive }: TimerType) => {
           <div className="flex gap-4 mb-4">
             <Button
               onClick={startTimer}
-              disabled={isActive || seconds === 0}
+              disabled={isActivated || seconds === 0}
               className={`px-4 py-2 rounded font-semibold transition-colors ${
-                isActive || seconds === 0
+                isActivated || seconds === 0
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                   : "bg-green-500 hover:bg-green-600 text-white"
               }`}
@@ -183,9 +186,9 @@ const Timer = ({ timerName, currentTime,isActive }: TimerType) => {
             </Button>
             <Button
               onClick={pauseTimer}
-              disabled={!isActive}
+              disabled={!isActivated}
               className={`px-6 py-2 rounded font-semibold transition-colors ${
-                !isActive
+                !isActivated
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                   : "bg-yellow-500 hover:bg-yellow-600 text-white"
               }`}
@@ -199,7 +202,8 @@ const Timer = ({ timerName, currentTime,isActive }: TimerType) => {
               Reset
             </Button>
             <Button
-              onClick={() => setShowSetDialog(true)}
+              onClick={() => {setShowSetDialog(true);console.log(timerName);
+              }}
               className="px-6 py-2 rounded font-semibold bg-blue-500 hover:bg-blue-600 text-white transition-colors"
             >
               Set Timer
@@ -258,7 +262,7 @@ const Timer = ({ timerName, currentTime,isActive }: TimerType) => {
             </div>
           )}
         </div>
-      )}
+    
     </main>
   );
 };

@@ -24,6 +24,8 @@ export const addNewTimerAction = async (
     await prisma.timer.create({
       data: newTimer
     })
+    console.log("New timer created:", newTimer);
+    
 
     revalidatePath("/timer");
   } catch (error) {
@@ -55,3 +57,20 @@ export const showTimerAction = async(active:boolean, timerId:string) => {
   revalidatePath("/timer");
 
  }
+
+export const deleteTimerAction = async (timerId: string) => {
+  try {
+    await prisma.timer.delete({
+      where: {
+        timerId: timerId,
+      },
+    });
+    revalidatePath("/timer");
+  } catch (error) {
+    console.error("Error deleting timer:", error);
+  }
+  return {
+    success: true,
+    message: "Timer deleted successfully",
+  };
+};  

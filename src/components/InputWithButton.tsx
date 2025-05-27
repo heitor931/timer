@@ -2,29 +2,51 @@
 
 
 import { addNewTimerAction } from "@/actions/timerActions"
+import useTimerStore from "@/app/timer/_context/store"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { useActionState } from "react"
+import { ChangeEvent, FormEvent, startTransition, useActionState, useState } from "react"
 
 
 
 function InputWithButton() {
-  const [state, action,isPending] = useActionState(
+  const [state, action] = useActionState(
     addNewTimerAction as (prevState: { message: string } | undefined, formData: FormData) => Promise<{ message: string } | undefined>,
     { message: "" }
   );
+  const [timerInput, setTimerInput] = useState("")
+  const {addTimer} = useTimerStore()
 
-  // const handleAddNewTimer = async (formData: FormData) => { 
-    
-  //   await action(formData);
-  //  }
+
+  const handleChangeValue = (e:ChangeEvent<HTMLInputElement>) => { 
+    setTimerInput(e.target.value);
+   }
+  
+  const handleAddNewTimer =  (e: FormEvent<HTMLFormElement>) => { 
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const timerName = formData.get("timerName") as string;
+    if (!timerName || timerName.trim() === "") {
+      return;
+    }
+      addTimer(timerName);
+      setTimerInput(""); // Clear the input field after submission
+
+      // update the database with the new timer
+      
+      startTransition(() => {
+      action(formData);
+     
+    });
+     
+   
+   }
 
 
   return (
-    <form action={action} className="flex m-auto w-full max-w-sm items-center space-x-2">
-      <Input  type="text" name="timerName" placeholder="Add a new timer" />
+    <form onSubmit={handleAddNewTimer}  className="flex m-auto w-full max-w-sm items-center space-x-2">
+      <Input onChange={handleChangeValue} value={timerInput}  type="text" name="timerName" placeholder="Add a new timer" />
       <Button type="submit">Submit</Button>
-      {isPending && <p className="text-blue-500 absolute translate-y-10 bg-white rounded border p-1">Adding...</p>}
       {state?.message && <p className="text-red-500 absolute translate-y-10 bg-white rounded border p-1">{state.message}</p>}
     </form>
   )
