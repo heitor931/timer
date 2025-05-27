@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect,MouseEvent } from "react";
+import { useState, useRef, useEffect,MouseEvent, startTransition } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { TimerType } from "@/lib/dummyData";
+import { openVlcAction } from "@/actions/timerActions";
 
 const Timer = ({ timerName, currentTime,isActive }: TimerType) => {
   const [seconds, setSeconds] = useState(currentTime || 3600); // Default to 1 hour if no currentTime is provided
@@ -100,6 +101,15 @@ const Timer = ({ timerName, currentTime,isActive }: TimerType) => {
       .padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
+  useEffect(() => {
+    if (seconds === 0) {
+      // Open VLC when timer reaches 0
+      startTransition(() => {
+        openVlcAction()
+      })
+    }
+  }, [seconds]);
+
   const handleSetTimer = () => {
     console.log(timerName);
     
@@ -124,7 +134,7 @@ const Timer = ({ timerName, currentTime,isActive }: TimerType) => {
           <Input
           onClick={handleShowTimer}
             type="text"
-            style={{backgroundColor: showTimer ? "#3b82f6" : "#000", color: showTimer ? "#000" : "white"}}
+            style={{backgroundColor: isActive ? "#3b82f6" : "#000", color: isActive ? "#000" : "white"}}
             className="w-80 text-center"
             value={timerLocalName}
             onChange={(e) => setTimerName(e.target.value)}

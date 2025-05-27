@@ -49,7 +49,7 @@ function TimerHeader({ timerName, timerId, isActive }: TimerHeaderProps) {
     <div onClick={handleClick} className="w-72">
       <ContextMenu>
         <ContextMenuTrigger>
-          <p className="bg-transparent cursor-pointer rounded-md border p-2 text-center">
+          <p style={{backgroundColor: isActive ? "#3b82f6" : "#000"}} className="bg-transparent cursor-pointer rounded-md border p-2 text-center">
             {timerName}
           </p>
         </ContextMenuTrigger>

@@ -3,6 +3,8 @@
 import { createNewTimer } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 import { prisma } from "../../prisma";
+import { exec } from "child_process";
+import os from "os";
 
 export const addNewTimerAction = async (
   prevState: { message: string; success: boolean },
@@ -74,3 +76,46 @@ export const deleteTimerAction = async (timerId: string) => {
     message: "Timer deleted successfully",
   };
 };  
+
+//open vlc action
+export const openVlcAction = async () => {
+  try {
+    let command = "";
+    if (os.platform() === "win32") {
+      // Windows VLC path (adjust if installed elsewhere)
+      const vlcPath = `"C:\\Program Files\\VideoLAN\\VLC\\vlc.exe"`;
+      const musicPath = `"C:\\Users\\engineer\\Music\\Silence"`; // adjust as needed
+      command = `${vlcPath} -Z ${musicPath}`;
+    } else if (os.platform() === "linux") {
+      // Linux VLC path (assumes vlc is in PATH)
+      const musicPath = `~/Music/Silence`; // adjust as needed
+      command = `vlc -Z ${musicPath}`;
+    } else {
+      return {
+        success: false,
+        message: "Unsupported OS",
+      };
+    }
+
+    exec(command, (error) => {
+      if (error) {
+        console.error("Failed to open VLC:", error);
+        return {
+          success: false,
+          message: "Failed to open VLC",
+        };
+      }
+    });
+
+    return {
+      success: true,
+      message: "VLC opened successfully",
+    };
+  } catch (error) {
+    console.error("Error opening VLC:", error);
+    return {
+      success: false,
+      message: "Error opening VLC",
+    };
+  }
+};

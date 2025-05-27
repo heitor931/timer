@@ -19,7 +19,7 @@ function TimerClientList({ activeTimers }: { activeTimers: TimerType[] }) {
     <main>
       <InputWithButton />
 
-      <div className="flex gap-2 ">
+      <div className="flex gap-2 justify-between items-start flex-wrap p-2">
         <div className="flex  flex-col w-72 gap-2">
           {render.map((timer) => (
             <TimerHeader key={timer.timerId} {...timer} />
