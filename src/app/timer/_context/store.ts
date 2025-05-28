@@ -8,6 +8,7 @@ type TimerContext = {
     showTimer:(timerId: string) => void
     deleteTimer: (timerId: string) => void
     setTimers: (timers: TimerType[]) => void
+    updateCurrentTime: (timerId: string, currentTime: number) => void
 }
 
 const useTimerStore = create<TimerContext>((set) => ({
@@ -15,6 +16,11 @@ const useTimerStore = create<TimerContext>((set) => ({
     setTimers: (timers: TimerType[]) => set({ timers }),
     addTimer: (timerName: string) => set((state) => ({
         timers: [createNewTimer(timerName),...state.timers, ]
+    })),
+    updateCurrentTime: (timerId: string, currentTime: number) => set((state) => ({
+        timers: state.timers.map(timer =>
+            timer.timerId === timerId ? { ...timer, currentTime } : timer
+        )
     })),
     showTimer: (timerId: string) => set((state) => ({
         timers: state.timers.map(timer =>

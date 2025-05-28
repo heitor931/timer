@@ -36,7 +36,7 @@ export function getCurrentTime(): string {
             timerEndDate: "01/01/2025",
             timerEndTime: "18:30:00",
             isPaused:false,
-            isActive:true,
+            isActive:false,
             isSet:false,
             isRunning:false,
             isStopped:false,

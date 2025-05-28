@@ -10,16 +10,28 @@ import {
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { TimerType } from "@/lib/dummyData";
-import { openVlcAction, updateInitialTimeAction, updateCurrentTimeAction } from "@/actions/timerActions";
+import { openVlcAction, updateInitialTimeAction, updateCurrentTimeAction, updateIsRunningAction } from "@/actions/timerActions";
+import useTimerStore from "@/app/timer/_context/store";
 
-const Timer = ({ timerName, currentTime, isActive, timerId, initialTime }: TimerType) => {
-  const [seconds, setSeconds] = useState(currentTime || 3600); // Default to 1 hour if no currentTime is provided
+const Timer = ({ timerName, currentTime, isActive,isRunning, timerId, initialTime }: TimerType) => {
+  const [seconds, setSeconds] = useState(currentTime); // Default to 1 hour if no currentTime is provided
   const [isActivated, setIsActive] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [timerLocalName, setTimerName] = useState(timerName);
+  const {updateCurrentTime } = useTimerStore()
+
+  useEffect(() => {
+    if (isRunning) {
+      startTimer()
+     }
+
+  },[])
 
     useEffect(() => {
       const handleBeforeUnload = () => {
+        console.log(seconds);
+        updateCurrentTime(timerId, seconds);
+        
         startTransition(() => {
           updateCurrentTimeAction(timerId, seconds);
         }
@@ -29,7 +41,7 @@ const Timer = ({ timerName, currentTime, isActive, timerId, initialTime }: Timer
       return () => {
         window.removeEventListener("beforeunload", handleBeforeUnload);
       };
-    }, [seconds]);
+    }, [seconds, timerId, updateCurrentTime]);
 
   // For set timer dialog
   const [showSetDialog, setShowSetDialog] = useState(false);
@@ -73,6 +85,12 @@ const Timer = ({ timerName, currentTime, isActive, timerId, initialTime }: Timer
         });
       }, 1000);
     }
+
+    // update isRunning with action
+    startTransition(() => {
+      updateIsRunningAction(timerId, true);
+    }
+    );
   };
 
   const pauseTimer = () => {
@@ -84,6 +102,12 @@ const Timer = ({ timerName, currentTime, isActive, timerId, initialTime }: Timer
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
+
+    // update isRunning with action
+    startTransition(() => {
+      updateIsRunningAction(timerId, false);
+    }
+    );
   };
 
   const resetTimer = () => {
@@ -125,11 +149,17 @@ const Timer = ({ timerName, currentTime, isActive, timerId, initialTime }: Timer
 
   const handleSetTimer = () => {
     const total = inputHours * 3600 + inputMinutes * 60 + inputSeconds;
+    const updateInitiateTimerAction = updateInitialTimeAction.bind(null, timerId, total);
+    startTransition(() => {
+      updateCurrentTimeAction(timerId, total);
+    }
+    );
     setSeconds(total);
     //update database with new timer values
-    startTransition(() => {
-      updateInitialTimeAction(timerId, total);
-    });
+    // startTransition(() => {
+    //   updateInitialTimeAction(timerId, total);
+    // });
+    updateInitiateTimerAction();
 
     setIsActive(false);
     setShowSetDialog(false);
@@ -243,56 +273,72 @@ const Timer = ({ timerName, currentTime, isActive, timerId, initialTime }: Timer
           </Button>
         </div>
         {showSetDialog && (
-          <div className="translate-y-38 flex items-center justify-center bg-black bg-opacity-40 z-50 fixed">
-            <div className="bg-white p-6 rounded shadow flex flex-col gap-4 min-w-[300px]">
-              <h3 className="text-lg font-bold mb-2 text-black">Set Timer</h3>
-              <div className="flex gap-2 items-center">
-                <Input
-                  type="number"
-                  min={0}
-                  max={99}
-                  value={inputHours}
-                  onChange={(e) => setInputHours(Number(e.target.value))}
-                  className="w-16 p-1 border rounded text-black"
-                  placeholder="HH"
-                />
-                <span className="text-black">:</span>
-                <Input
-                  type="number"
-                  min={0}
-                  max={59}
-                  value={inputMinutes}
-                  onChange={(e) => setInputMinutes(Number(e.target.value))}
-                  className="w-16 p-1 border rounded text-black"
-                  placeholder="MM"
-                />
-                <span className="text-black">:</span>
-                <Input
-                  type="number"
-                  min={0}
-                  max={59}
-                  value={inputSeconds}
-                  onChange={(e) => setInputSeconds(Number(e.target.value))}
-                  className="w-16 p-1 border rounded text-black"
-                  placeholder="SS"
-                />
-              </div>
-              <div className="flex gap-2 justify-end">
-                <Button
+            <div className="w-full absolute translate-y-36 z-10 flex flex-col items-center justify-center mt-4">
+              <div className="bg-white p-6 rounded-xl shadow-lg flex flex-col gap-6 min-w-[320px] border border-gray-200 relative">
+                <button
                   onClick={() => setShowSetDialog(false)}
-                  className="bg-gray-300 text-black hover:bg-gray-400"
+                  className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none"
+                  aria-label="Close"
                 >
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleSetTimer}
-                  className="bg-blue-500 text-white hover:bg-blue-600"
-                >
-                  Set
-                </Button>
+                  &times;
+                </button>
+                <h3 className="text-xl font-bold mb-2 text-gray-900 text-center">Set Timer</h3>
+                <div className="flex gap-3 items-center justify-center">
+                  <div className="flex flex-col items-center">
+                    <Input
+                      type="number"
+                      min={0}
+                      max={99}
+                      value={inputHours}
+                      onChange={(e) => setInputHours(Number(e.target.value))}
+                      className="w-16 p-2 border-2 border-gray-300 rounded-lg text-center text-lg font-mono text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                      placeholder="HH"
+                    />
+                    <span className="text-xs text-gray-500 mt-1">Hours</span>
+                  </div>
+                  <span className="text-2xl font-bold text-gray-700">:</span>
+                  <div className="flex flex-col items-center">
+                    <Input
+                      type="number"
+                      min={0}
+                      max={59}
+                      value={inputMinutes}
+                      onChange={(e) => setInputMinutes(Number(e.target.value))}
+                      className="w-16 p-2 border-2 border-gray-300 rounded-lg text-center text-lg font-mono text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                      placeholder="MM"
+                    />
+                    <span className="text-xs text-gray-500 mt-1">Minutes</span>
+                  </div>
+                  <span className="text-2xl font-bold text-gray-700">:</span>
+                  <div className="flex flex-col items-center">
+                    <Input
+                      type="number"
+                      min={0}
+                      max={59}
+                      value={inputSeconds}
+                      onChange={(e) => setInputSeconds(Number(e.target.value))}
+                      className="w-16 p-2 border-2 border-gray-300 rounded-lg text-center text-lg font-mono text-black focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                      placeholder="SS"
+                    />
+                    <span className="text-xs text-gray-500 mt-1">Seconds</span>
+                  </div>
+                </div>
+                <div className="flex gap-3 justify-end mt-4">
+                  <Button
+                    onClick={() => setShowSetDialog(false)}
+                    className="bg-gray-200 text-gray-700 hover:bg-gray-300 font-semibold px-5 py-2 rounded-lg"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleSetTimer}
+                    className="bg-blue-600 text-white hover:bg-blue-700 font-semibold px-5 py-2 rounded-lg shadow"
+                  >
+                    Set
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
         )}
       </div>
     </main>

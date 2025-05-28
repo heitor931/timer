@@ -1,5 +1,6 @@
 "use server";
 
+
 import { createNewTimer } from "@/lib/utils";
 import { revalidatePath } from "next/cache";
 import { prisma } from "../../prisma";
@@ -157,6 +158,26 @@ export const updateInitialTimeAction = async (timerId: string, initialTime: numb
     return {
       success: false,
       message: "Error updating timer start time",
+    };
+  }
+};
+
+export const updateIsRunningAction = async (timerId: string, isRunning: boolean) => {
+  try {
+    await prisma.timer.update({
+      where: { timerId },
+      data: { isRunning }
+    });
+    revalidatePath("/timer");
+    return {
+      success: true,
+      message: "Timer running state updated successfully",
+    };
+  } catch (error) {
+    console.error("Error updating timer running state:", error);
+    return {
+      success: false,
+      message: "Error updating timer running state",
     };
   }
 };
