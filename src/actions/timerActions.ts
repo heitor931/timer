@@ -82,8 +82,8 @@ export const openVlcAction = async () => {
     let command = "";
     if (os.platform() === "win32") {
       // Windows VLC path (adjust if installed elsewhere)
-      const vlcPath = `"C:\\Program Files\\VideoLAN\\VLC\\vlc.exe"`;
-      const musicPath = `"C:\\Users\\engineer\\Music\\Silence"`; // adjust as needed
+      const vlcPath = `"C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe"`;
+      const musicPath = `"C:\\Engineering\\Music\\yoga_music"`; // adjust as needed
       command = `${vlcPath} -Z ${musicPath}`;
     } else if (os.platform() === "linux") {
       // Linux VLC path (assumes vlc is in PATH)
