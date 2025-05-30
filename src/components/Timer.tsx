@@ -18,7 +18,8 @@ const Timer = ({ timerName, currentTime, isActive,isRunning, timerId, initialTim
   const [isActivated, setIsActive] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [timerLocalName, setTimerName] = useState(timerName);
-  const {updateCurrentTime } = useTimerStore()
+  const {updateCurrentTime, pid, setPid } = useTimerStore()
+
 
   useEffect(() => {
     if (isRunning) {
@@ -145,14 +146,21 @@ const Timer = ({ timerName, currentTime, isActive,isRunning, timerId, initialTim
       setSeconds(initialTime);
       startTransition(() => {
         updateCurrentTimeAction(timerId, initialTime);
-        closeVlcAction()
+        console.log(pid);
+        // Get pid of the last 
+        if (pid) {
+          closeVlcAction(pid);
+        }
+        
       });
     } else  if (seconds === 0) {
       setSeconds(initialTime);
       // Open VLC when timer reaches 0
-      startTransition(() => {
+      startTransition(async() => {
         updateCurrentTimeAction(timerId, initialTime);
-        openVlcAction();
+       const { pid } = await openVlcAction()
+       setPid(pid!);
+       console.log("VLC opened with PID:", pid);
       });
     } 
   }, [seconds]);

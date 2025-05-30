@@ -9,6 +9,8 @@ type TimerContext = {
     deleteTimer: (timerId: string) => void
     setTimers: (timers: TimerType[]) => void
     updateCurrentTime: (timerId: string, currentTime: number) => void
+    pid: number | null
+    setPid:(pid: number) => void
 }
 
 const useTimerStore = create<TimerContext>((set) => ({
@@ -29,7 +31,9 @@ const useTimerStore = create<TimerContext>((set) => ({
     })),
     deleteTimer: (timerId: string) => set((state) => ({
         timers: state.timers.filter(timer => timer.timerId !== timerId)
-    }))
+    })),
+    pid: null,
+    setPid: (pid: number) => set({ pid  })
 }))
 
 export default useTimerStore;

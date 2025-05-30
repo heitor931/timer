@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "../../prisma";
 import { exec } from "child_process";
 import os from "os";
-
+import { spawn } from "child_process";
 export const addNewTimerAction = async (
   prevState: { message: string; success: boolean },
   formData: FormData
@@ -78,48 +78,7 @@ export const deleteTimerAction = async (timerId: string) => {
 };  
 
 //open vlc action
-export const openVlcAction = async () => {
-  try {
-    let command = "";
-    if (os.platform() === "win32") {
-      // Windows VLC path (adjust if installed elsewhere)
-      const vlcPath = `"C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe"`;
-      const musicPath = `"C:\\Engineering\\Music\\yoga_music"`; // adjust as needed
-      command = `${vlcPath} -Z ${musicPath}`;
-      
-    } else if (os.platform() === "linux") {
-      // Linux VLC path (assumes vlc is in PATH)
-      const musicPath = `~/Music/Silence`; // adjust as needed
-      command = `vlc -Z ${musicPath}`;
-    } else {
-      return {
-        success: false,
-        message: "Unsupported OS",
-      };
-    }
 
-    exec(command, (error) => {
-      if (error) {
-        console.error("Failed to open VLC:", error);
-        return {
-          success: false,
-          message: "Failed to open VLC",
-        };
-      }
-    });
-
-    return {
-      success: true,
-      message: "VLC opened successfully",
-    };
-  } catch (error) {
-    console.error("Error opening VLC:", error);
-    return {
-      success: false,
-      message: "Error opening VLC",
-    };
-  }
-};
 
 // update current time action
 export const updateCurrentTimeAction = async (timerId: string, currentTime: number) => {
@@ -183,18 +142,111 @@ export const updateIsRunningAction = async (timerId: string, isRunning: boolean)
   }
 };
 
+// export const openVlcAction = async () => {
+//   try {
+//     let command = "";
+//     if (os.platform() === "win32") {
+//       // Windows VLC path (adjust if installed elsewhere)
+//       const vlcPath = `"C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe"`;
+//       const musicPath = `"C:\\Engineering\\Music\\yoga_music"`; // adjust as needed
+//       command = `${vlcPath} -Z ${musicPath}`;
+      
+//     } else if (os.platform() === "linux") {
+//       // Linux VLC path (assumes vlc is in PATH)
+//       const musicPath = `~/Music/Silence`; // adjust as needed
+//       command = `vlc -Z ${musicPath}`;
+//     } else {
+//       return {
+//         success: false,
+//         message: "Unsupported OS",
+//       };
+//     }
+
+//      const child = exec(command, (error) => {
+//       if (error) {
+//         console.error("Failed to open VLC:", error);
+//         return {
+//           success: false,
+//           message: "Failed to open VLC",
+//         };
+//       }
+//     });
+
+   
+    
+
+//     // Return the PID of the launched process
+//     return {
+//       success: true,
+//       message: "VLC opened successfully",
+//       pid: child.pid
+//     };
+
+    
+//   } catch (error) {
+//     console.error("Error opening VLC:", error);
+//     return {
+//       success: false,
+//       message: "Error opening VLC",
+//       pid: null
+//     };
+//   }
+// };
+
+export const openVlcAction = async () => {
+  try {
+    let vlcPath = "";
+    let musicPath = "";
+    let args: string[] = [];
+
+    if (os.platform() === "win32") {
+      vlcPath = "C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe";
+      musicPath = "C:\\Engineering\\Music\\yoga_music";
+      args = ["-Z", musicPath];
+    } else if (os.platform() === "linux") {
+      vlcPath = "vlc";
+      musicPath = "~/Music/Silence";
+      args = ["-Z", musicPath];
+    } else {
+      return {
+        success: false,
+        message: "Unsupported OS",
+      };
+    }
+
+    const child = spawn(vlcPath, args, {
+      detached: true,
+      stdio: "ignore"
+    });
+    child.unref();
+
+    return {
+      success: true,
+      message: "VLC opened successfully",
+      pid: child.pid
+    };
+  } catch (error) {
+    console.error("Error opening VLC:", error);
+    return {
+      success: false,
+      message: "Error opening VLC",
+      pid: null
+    };
+  }
+};
+
 // create action to close the vlc player opened by the openVlcAction
-export const closeVlcAction = async () => {
-
-
+export const closeVlcAction = async (pid:number) => {
+  console.log(pid);
+  
   try {
     let command = "";
     if (os.platform() === "win32") {
       // Windows VLC path (adjust if installed elsewhere)
-      command = `taskkill /IM vlc.exe /F`;
+        command = `taskkill /PID ${pid} /F`;
     } else if (os.platform() === "linux") {
       // Linux VLC path (assumes vlc is in PATH)
-      command = `pkill vlc`;
+      command = `kill ${pid}`;
     } else {
       return {
         success: false,
