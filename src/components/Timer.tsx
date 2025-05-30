@@ -10,7 +10,7 @@ import {
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { TimerType } from "@/lib/dummyData";
-import { openVlcAction, updateInitialTimeAction, updateCurrentTimeAction, updateIsRunningAction } from "@/actions/timerActions";
+import { openVlcAction, updateInitialTimeAction, updateCurrentTimeAction, updateIsRunningAction, closeVlcAction } from "@/actions/timerActions";
 import useTimerStore from "@/app/timer/_context/store";
 
 const Timer = ({ timerName, currentTime, isActive,isRunning, timerId, initialTime }: TimerType) => {
@@ -139,12 +139,22 @@ const Timer = ({ timerName, currentTime, isActive,isRunning, timerId, initialTim
   };
 
   useEffect(() => {
-    if (seconds === 0) {
+  
+    if (seconds === 0 && timerName === "CHILL_TIMER") {
+      // Reset the timer to 1 hour if it reaches 0 and the timer name is "CHILL_TIMER"
+      setSeconds(initialTime);
+      startTransition(() => {
+        updateCurrentTimeAction(timerId, initialTime);
+        closeVlcAction()
+      });
+    } else  if (seconds === 0) {
+      setSeconds(initialTime);
       // Open VLC when timer reaches 0
       startTransition(() => {
+        updateCurrentTimeAction(timerId, initialTime);
         openVlcAction();
       });
-    }
+    } 
   }, [seconds]);
 
   const handleSetTimer = () => {

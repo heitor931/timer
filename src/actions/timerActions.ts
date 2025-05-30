@@ -86,6 +86,7 @@ export const openVlcAction = async () => {
       const vlcPath = `"C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe"`;
       const musicPath = `"C:\\Engineering\\Music\\yoga_music"`; // adjust as needed
       command = `${vlcPath} -Z ${musicPath}`;
+      
     } else if (os.platform() === "linux") {
       // Linux VLC path (assumes vlc is in PATH)
       const musicPath = `~/Music/Silence`; // adjust as needed
@@ -181,3 +182,45 @@ export const updateIsRunningAction = async (timerId: string, isRunning: boolean)
     };
   }
 };
+
+// create action to close the vlc player opened by the openVlcAction
+export const closeVlcAction = async () => {
+
+
+  try {
+    let command = "";
+    if (os.platform() === "win32") {
+      // Windows VLC path (adjust if installed elsewhere)
+      command = `taskkill /IM vlc.exe /F`;
+    } else if (os.platform() === "linux") {
+      // Linux VLC path (assumes vlc is in PATH)
+      command = `pkill vlc`;
+    } else {
+      return {
+        success: false,
+        message: "Unsupported OS",
+      };
+    }
+
+    exec(command, (error) => {
+      if (error) {
+        console.error("Failed to close VLC:", error);
+        return {
+          success: false,
+          message: "Failed to close VLC",
+        };
+      }
+    });
+
+    return {
+      success: true,
+      message: "VLC closed successfully",
+    };
+  } catch (error) {
+    console.error("Error closing VLC:", error);
+    return {
+      success: false,
+      message: "Error closing VLC",
+    };
+  }
+}
