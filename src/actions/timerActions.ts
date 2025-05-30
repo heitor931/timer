@@ -142,56 +142,6 @@ export const updateIsRunningAction = async (timerId: string, isRunning: boolean)
   }
 };
 
-// export const openVlcAction = async () => {
-//   try {
-//     let command = "";
-//     if (os.platform() === "win32") {
-//       // Windows VLC path (adjust if installed elsewhere)
-//       const vlcPath = `"C:\\Program Files (x86)\\VideoLAN\\VLC\\vlc.exe"`;
-//       const musicPath = `"C:\\Engineering\\Music\\yoga_music"`; // adjust as needed
-//       command = `${vlcPath} -Z ${musicPath}`;
-      
-//     } else if (os.platform() === "linux") {
-//       // Linux VLC path (assumes vlc is in PATH)
-//       const musicPath = `~/Music/Silence`; // adjust as needed
-//       command = `vlc -Z ${musicPath}`;
-//     } else {
-//       return {
-//         success: false,
-//         message: "Unsupported OS",
-//       };
-//     }
-
-//      const child = exec(command, (error) => {
-//       if (error) {
-//         console.error("Failed to open VLC:", error);
-//         return {
-//           success: false,
-//           message: "Failed to open VLC",
-//         };
-//       }
-//     });
-
-   
-    
-
-//     // Return the PID of the launched process
-//     return {
-//       success: true,
-//       message: "VLC opened successfully",
-//       pid: child.pid
-//     };
-
-    
-//   } catch (error) {
-//     console.error("Error opening VLC:", error);
-//     return {
-//       success: false,
-//       message: "Error opening VLC",
-//       pid: null
-//     };
-//   }
-// };
 
 export const openVlcAction = async () => {
   try {

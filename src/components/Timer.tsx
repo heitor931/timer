@@ -146,6 +146,7 @@ const Timer = ({ timerName, currentTime, isActive,isRunning, timerId, initialTim
       setSeconds(initialTime);
       startTransition(() => {
         updateCurrentTimeAction(timerId, initialTime);
+        updateIsRunningAction(timerId, false);
         console.log(pid);
         // Get pid of the last 
         if (pid) {
@@ -158,6 +159,7 @@ const Timer = ({ timerName, currentTime, isActive,isRunning, timerId, initialTim
       // Open VLC when timer reaches 0
       startTransition(async() => {
         updateCurrentTimeAction(timerId, initialTime);
+        updateIsRunningAction(timerId, false);
        const { pid } = await openVlcAction()
        setPid(pid!);
        console.log("VLC opened with PID:", pid);
